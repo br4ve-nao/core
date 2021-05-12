@@ -55,20 +55,20 @@ async function run() {
   }
 
   console.log(`Setting up proxy pointing at the market registry logic`)
-  const proxyContract = await Proxy.new(marketRegistryImpl.address)
+  //const proxyContract = await Proxy.new(marketRegistryImpl.address)
   console.log(`Initializing MarketsRegistry`)
   const deployedMarketsRegistry = await MarketsRegistry.at(
-    proxyContract.address,
+    "0xC19dB90Be82D151AC81c448D2AB239F130F76310",
   )
 
-  const result = await deployedMarketsRegistry.initialize(
-    tokenImpl.address,
-    marketImpl.address,
-    ammImpl.address,
-  )
+  // const result = await deployedMarketsRegistry.initialize(
+  //   tokenImpl.address,
+  //   marketImpl.address,
+  //   ammImpl.address,
+  // )
 
   console.log(
-    `Market registry is up and running at address ${deployedMarketsRegistry.address}, initialized with tx id ${result.tx}`,
+    `Market registry is up and running at address ${deployedMarketsRegistry.address}`,
   )
 
   let priceOracle
@@ -134,6 +134,7 @@ async function run() {
   // )
 
   // call createMarket several times to setup example markets
+  let i = 0
   for (let marketData of marketSetupData) {
     let collateralToken
     let paymentToken
@@ -149,8 +150,11 @@ async function run() {
       paymentToken = WBTCToken
       amm = ammUSDCWBTC
     }
+
+    const k = i * 50
+    const name = marketData.marketName + "y"
     const res = await deployedMarketsRegistry.createMarket(
-      marketData.marketName,
+      name,
       collateralToken.address,
       paymentToken.address,
       marketData.marketStyle,
@@ -164,6 +168,7 @@ async function run() {
     console.log(
       `created market with marketName: ${marketData.marketName} with tx id: ${res.tx}`,
     )
+    i++
   }
 
   console.log("completed deploy of 2 AMM contracts and multiple Markets")
